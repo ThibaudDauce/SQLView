@@ -32,7 +32,9 @@ class Grammar extends BaseGrammar {
 	*/
 	public function compileCreate(Blueprint $blueprint, Fluent $command, Connection $connection)
 	{
-		$sql = 'create view '.$this->wrapView($blueprint).' as ';
+		$sqlQuery = $blueprint->getQuery()->toSql();
+
+		$sql = 'create view '.$this->wrapView($blueprint).' as '.$sqlQuery;
 
 		return $sql;
 	}
