@@ -4,6 +4,8 @@ use Closure;
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Grammars\Grammar;
+use ThibaudDauce\SQLView\Grammars\Grammar as ViewGrammar;
+use ThibaudDauce\SQLView\Exceptions\BlueprintNotReadyException;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
 class Blueprint {
@@ -39,7 +41,6 @@ class Blueprint {
   public function __construct($view, Connection $connection, Closure $callback = null)
   {
     $this->view = $view;
-    $this->query = $this->newBaseQueryBuilder($connection);
 
     if ( ! is_null($callback)) $callback($this);
   }
@@ -77,14 +78,43 @@ class Blueprint {
   }
 
   /**
+   * Create or return the query the blueprint describes.
+   *
+   * @return \Illuminate\Database\Query\Builder
+   */
+  public function query($table = null)
+  {
+    if (isset($this->query))
+      return $this->getQuery();
+    elseif ($table !== null) {
+
+      $this->query = $this->newBaseQueryBuilder($connection)->from($table);
+      return $this->getQuery();
+    }
+  }
+
+  /**
+   * Is the blueprint ready to build.
+   *
+   * @return boolean
+   */
+  public function isReady()
+  {
+    return isset($this->query);
+  }
+
+  /**
    * Execute the blueprint against the database.
    *
    * @param  \Illuminate\Database\Connection        $connection
    * @param  \ThibaudDauce\SQLView\Grammars\Grammar $grammar
    * @return void
    */
-  public function build(Connection $connection, Grammar $grammar)
+  public function build(Connection $connection, ViewGrammar $grammar)
   {
+    if (!$this->isReady())
+      throw new BlueprintNotReadyException("test");
+
     foreach ($this->toSql($connection, $grammar) as $statement)
     {
       $connection->statement($statement);
@@ -98,7 +128,7 @@ class Blueprint {
    * @param  \ThibaudDauce\SQLView\Grammars\Grammar  $grammar
    * @return array
    */
-  public function toSql(Connection $connection, Grammar $grammar)
+  public function toSql(Connection $connection, ViewGrammar $grammar)
   {
     $statements = array();
 
@@ -155,5 +185,21 @@ class Blueprint {
   protected function createCommand($name, array $parameters = array())
   {
     return new Fluent(array_merge(compact('name'), $parameters));
+  }
+
+
+  /**
+   * Determine if the blueprint has a create command.
+   *
+   * @return bool
+   */
+  protected function creating()
+  {
+    foreach ($this->commands as $command)
+    {
+      if ($command->name == 'create') return true;
+    }
+
+    return false;
   }
 }
