@@ -15,6 +15,13 @@ class Blueprint {
   protected $view;
 
   /**
+   * View's SQL statement.
+   *
+   * @var \Illuminate\Database\Query\Builder
+   */
+  protected $query;
+
+  /**
    * The commands that should be run for the view.
    *
    * @var array
@@ -28,21 +35,44 @@ class Blueprint {
    * @param  \Closure $callback
    * @return void
    */
-  public function __construct($view, Closure $callback = null)
+  public function __construct($view, Connection $connection, Closure $callback = null)
   {
     $this->view = $view;
+    $this->query = $this->newBaseQueryBuilder($connection);
 
     if ( ! is_null($callback)) $callback($this);
   }
 
   /**
-   * Get the view the blueprint describes.
+   * Get a new query builder instance for the connection.
+   *
+   * @return \Illuminate\Database\Query\Builder
+   */
+  protected function newBaseQueryBuilder(Connection $connection)
+  {
+    $grammar = $connection->getQueryGrammar();
+
+    return new QueryBuilder($connection, $grammar, $connection->getPostProcessor());
+  }
+
+  /**
+   * Get the view's SQL statement.
    *
    * @return string
    */
   public function getView()
   {
     return $this->view;
+  }
+
+  /**
+   * Get the query the blueprint describes.
+   *
+   * @return \Illuminate\Database\Query\Builder
+   */
+  public function getQuery()
+  {
+    return $this->query;
   }
 
   /**

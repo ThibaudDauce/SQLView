@@ -38,7 +38,7 @@ class Builder {
    */
   public function create($view, Closure $callback)
   {
-    $blueprint = new Blueprint($view);
+    $blueprint = new Blueprint($view, $this->getConnection());
 
     $blueprint->create();
 
