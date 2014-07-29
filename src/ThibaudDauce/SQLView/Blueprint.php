@@ -15,7 +15,7 @@ class Blueprint {
   protected $view;
 
   /**
-   * The commands that should be run for the table.
+   * The commands that should be run for the view.
    *
    * @var array
    */
