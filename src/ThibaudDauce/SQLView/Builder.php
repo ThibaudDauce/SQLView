@@ -1,10 +1,12 @@
 <?php namespace ThibaudDauce\SQLView;
 
+use ThibaudDauce\SQLView\Grammars\Grammar;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
 class Builder {
 
-  public $connection;
+  protected $connection;
+  protected $grammar;
 
   /**
    * Create a new database View manager.
@@ -14,8 +16,8 @@ class Builder {
   public function __construct()
   {
     $this->connection = \DB::connection();
+    $this->grammar = new Grammar;
   }
-
 
   /**
    * Get the database connection.
@@ -28,16 +30,31 @@ class Builder {
   }
 
   /**
-   * Get a new query builder instance for the connection.
+   * Create a new view on the schema.
    *
-   * @return \Illuminate\Database\Query\Builder
+   * @param  string    $view
+   * @param  \Closure  $callback
+   * @return \ThibaudDauce\SQLView\Blueprint
    */
-  protected function newBaseQueryBuilder()
+  public function create($view, Closure $callback)
   {
-    $connection = $this->getConnection();
+    $blueprint = new Blueprint($view);
 
-    $grammar = $connection->getQueryGrammar();
+    $blueprint->create();
 
-    return new QueryBuilder($connection, $grammar, $connection->getPostProcessor());
+    $callback($blueprint);
+
+    $this->build($blueprint);
+  }
+
+  /**
+   * Execute the blueprint to build / modify the view.
+   *
+   * @param  \ThibaudDauce\SQLView\Blueprint  $blueprint
+   * @return void
+   */
+  protected function build(Blueprint $blueprint)
+  {
+    $blueprint->build($this->getConnection(), $this->grammar);
   }
 }
