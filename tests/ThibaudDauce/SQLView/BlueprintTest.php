@@ -41,6 +41,11 @@ class BlueprintTest extends PHPUnit_Framework_TestCase {
     $this->blueprint->build($this->connection, $this->grammar);
   }
 
+  public function testSingletonQuery() {
+
+    $query = $this->blueprint->query();
+  }
+
   public function testNoCommandBuild() {
 
     $this->blueprint->query('test');
@@ -49,7 +54,7 @@ class BlueprintTest extends PHPUnit_Framework_TestCase {
 
   }
 
-  public function testSimpleSelectBuild() {
+  public function testSimpleSelect() {
 
     $this->blueprint->query('test');
     $this->blueprint->create();

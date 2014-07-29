@@ -6,6 +6,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use ThibaudDauce\SQLView\Grammars\Grammar as ViewGrammar;
 use ThibaudDauce\SQLView\Exceptions\BlueprintNotReadyException;
+use ThibaudDauce\SQLView\Exceptions\InvalidQueryException;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
 class Blueprint {
@@ -99,6 +100,8 @@ class Blueprint {
       $this->query = $this->newBaseQueryBuilder($this->connection)->from($table);
       return $this->getQuery();
     }
+
+    throw new InvalidQueryException("Call first query method with table name parameter.")
   }
 
   /**
@@ -121,7 +124,7 @@ class Blueprint {
   public function build(Connection $connection, ViewGrammar $grammar)
   {
     if (!$this->isReady())
-      throw new BlueprintNotReadyException("test");
+      throw new BlueprintNotReadyException("Blueprint is not ready to build. Maybe add a query first.");
 
     foreach ($this->toSql($connection, $grammar) as $statement)
     {
