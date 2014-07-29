@@ -2,11 +2,13 @@
 
 use ThibaudDauce\SQLView\Blueprint;
 use Illuminate\Database\Query\Grammars\Grammar;
+use ThibaudDauce\SQLView\Grammars\Grammar as ViewGrammar;
 use Illuminate\Database\Query\Processors\Processor;
 
 class BlueprintTest extends PHPUnit_Framework_TestCase {
 
   public $connection;
+  public $blueprint;
 
   public function setUp()
   {
@@ -15,6 +17,10 @@ class BlueprintTest extends PHPUnit_Framework_TestCase {
     $this->connection = $this->getMockConnection();
     $this->connection->setQueryGrammar(new Grammar);
     $this->connection->setPostProcessor(new Processor);
+
+    $this->grammar = new ViewGrammar;
+
+    $this->blueprint = new Blueprint('view', $this->connection);
   }
 
   public function tearDown()
@@ -24,9 +30,31 @@ class BlueprintTest extends PHPUnit_Framework_TestCase {
 
   public function testConstruct()
   {
-    $blueprint = new Blueprint('view', $this->connection);
+    $this->assertEquals('view', $this->blueprint->getView());
+  }
 
-    $this->assertEquals('view', $blueprint->getView());
+  /**
+   * @expectedException \ThibaudDauce\SQLView\Exceptions\BlueprintNotReadyException
+  */
+  public function testNoQueryBuild() {
+
+    $this->blueprint->build($this->connection, $this->grammar);
+  }
+
+  public function testNoCommandBuild() {
+
+    $this->blueprint->query('test');
+    $statements = $this->blueprint->build($this->connection, $this->grammar);
+    $this->assertEmpty($statements);
+
+  }
+
+  public function testSimpleSelectBuild() {
+
+    $this->blueprint->query('test');
+    $this->blueprint->create();
+    $statements = $this->blueprint->toSql($this->connection, $this->grammar);
+    $this->assertEquals(array('create view "view" as select * from "test"'), $statements);
   }
 
   protected function getMockConnection($methods = array(), $pdo = null)

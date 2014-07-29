@@ -18,6 +18,13 @@ class Blueprint {
   protected $view;
 
   /**
+   * The connection.
+   *
+   * @var string
+   */
+  protected $connection;
+
+  /**
    * View's SQL statement.
    *
    * @var \Illuminate\Database\Query\Builder
@@ -41,6 +48,7 @@ class Blueprint {
   public function __construct($view, Connection $connection, Closure $callback = null)
   {
     $this->view = $view;
+    $this->connection = $connection;
 
     if ( ! is_null($callback)) $callback($this);
   }
@@ -88,7 +96,7 @@ class Blueprint {
       return $this->getQuery();
     elseif ($table !== null) {
 
-      $this->query = $this->newBaseQueryBuilder($connection)->from($table);
+      $this->query = $this->newBaseQueryBuilder($this->connection)->from($table);
       return $this->getQuery();
     }
   }
