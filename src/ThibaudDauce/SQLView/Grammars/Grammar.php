@@ -15,7 +15,7 @@ class Grammar extends BaseGrammar {
 	*/
 	public function wrapView($view)
 	{
-		if ($table instanceof Blueprint) $view = $view->getView();
+		if ($view instanceof Blueprint) $view = $view->getView();
 
 		if ($this->isExpression($view)) return $this->getValue($view);
 
