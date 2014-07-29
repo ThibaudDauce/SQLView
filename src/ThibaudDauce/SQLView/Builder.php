@@ -1,7 +1,6 @@
 <?php namespace ThibaudDauce\SQLView;
 
 use ThibaudDauce\SQLView\Grammars\Grammar;
-use Illuminate\Database\Query\Builder as QueryBuilder;
 
 class Builder {
 
