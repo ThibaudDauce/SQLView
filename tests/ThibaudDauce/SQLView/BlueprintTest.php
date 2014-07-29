@@ -41,9 +41,18 @@ class BlueprintTest extends PHPUnit_Framework_TestCase {
     $this->blueprint->build($this->connection, $this->grammar);
   }
 
-  public function testSingletonQuery() {
+  /**
+   * @expectedException \ThibaudDauce\SQLView\Exceptions\InvalidQueryException
+  */
+  public function testWrongInitialisationSingletonQuery() {
 
     $query = $this->blueprint->query();
+  }
+
+  public function testSingletonQuery() {
+
+    $query = $this->blueprint->query('test');
+    $this->assertEquals($query, $this->blueprint->query());
   }
 
   public function testNoCommandBuild() {
