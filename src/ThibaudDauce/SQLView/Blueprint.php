@@ -36,6 +36,16 @@ class Blueprint {
   }
 
   /**
+   * Get the view the blueprint describes.
+   *
+   * @return string
+   */
+  public function getView()
+  {
+    return $this->view;
+  }
+
+  /**
    * Execute the blueprint against the database.
    *
    * @param  \Illuminate\Database\Connection        $connection
@@ -44,7 +54,40 @@ class Blueprint {
    */
   public function build(Connection $connection, Grammar $grammar)
   {
-    
+    foreach ($this->toSql($connection, $grammar) as $statement)
+    {
+      $connection->statement($statement);
+    }
+  }
+
+  /**
+   * Get the raw SQL statements for the blueprint.
+   *
+   * @param  \Illuminate\Database\Connection         $connection
+   * @param  \ThibaudDauce\SQLView\Grammars\Grammar  $grammar
+   * @return array
+   */
+  public function toSql(Connection $connection, Grammar $grammar)
+  {
+    $statements = array();
+
+    // Each type of command has a corresponding compiler function on the schema
+    // grammar which is used to build the necessary SQL statements to build
+    // the blueprint element, so we'll just call that compilers function.
+    foreach ($this->commands as $command)
+    {
+      $method = 'compile'.ucfirst($command->name);
+
+      if (method_exists($grammar, $method))
+      {
+        if ( ! is_null($sql = $grammar->$method($this, $command, $connection)))
+        {
+          $statements = array_merge($statements, (array) $sql);
+        }
+      }
+    }
+
+    return $statements;
   }
 
   /**
