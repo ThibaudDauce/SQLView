@@ -101,7 +101,7 @@ class Blueprint {
       return $this->getQuery();
     }
 
-    throw new InvalidQueryException("Call first query method with table name parameter.")
+    throw new InvalidQueryException("Call first query method with table name parameter.");
   }
 
   /**
