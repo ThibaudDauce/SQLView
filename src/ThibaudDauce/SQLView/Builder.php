@@ -1,5 +1,6 @@
 <?php namespace ThibaudDauce\SQLView;
 
+use Closure;
 use ThibaudDauce\SQLView\Grammars\Grammar;
 
 class Builder {

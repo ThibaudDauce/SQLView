@@ -34,30 +34,23 @@ class BlueprintTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   * @expectedException \ThibaudDauce\SQLView\Exceptions\BlueprintNotReadyException
-  */
-  public function testNoQueryBuild() {
-
-    $this->blueprint->build($this->connection, $this->grammar);
-  }
-
-  /**
    * @expectedException \ThibaudDauce\SQLView\Exceptions\InvalidQueryException
   */
-  public function testWrongInitialisationSingletonQuery() {
+  public function testGetNoQuery() {
 
-    $query = $this->blueprint->query();
+    $query = $this->blueprint->getQuery();
   }
 
-  public function testSingletonQuery() {
+  public function testAddQuery() {
 
-    $query = $this->blueprint->query('test');
-    $this->assertEquals($query, $this->blueprint->query());
+    $query = $this->blueprint->newQuery('test');
+    $this->blueprint->setQuery($query);
+    $this->assertEquals($query, $this->blueprint->getQuery());
   }
 
   public function testNoCommandBuild() {
 
-    $this->blueprint->query('test');
+    $this->blueprint->setQuery($this->blueprint->newQuery('test'));
     $statements = $this->blueprint->build($this->connection, $this->grammar);
     $this->assertEmpty($statements);
 
@@ -65,7 +58,7 @@ class BlueprintTest extends PHPUnit_Framework_TestCase {
 
   public function testSimpleSelect() {
 
-    $this->blueprint->query('test');
+    $this->blueprint->setQuery($this->blueprint->newQuery('test'));
     $this->blueprint->create();
     $statements = $this->blueprint->toSql($this->connection, $this->grammar);
     $this->assertEquals(array('create view "view" as select * from "test"'), $statements);

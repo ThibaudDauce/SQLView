@@ -26,7 +26,7 @@ class Blueprint {
   protected $connection;
 
   /**
-   * View's SQL statement.
+   * View's SQL statements.
    *
    * @var \Illuminate\Database\Query\Builder
    */
@@ -83,35 +83,31 @@ class Blueprint {
    */
   public function getQuery()
   {
+    if (!isset($this->query))
+      throw new InvalidQueryException("Call first setQuery method.");
+
     return $this->query;
   }
 
   /**
-   * Create or return the query the blueprint describes.
+   * Set the query the blueprint describes.
    *
-   * @return \Illuminate\Database\Query\Builder
+   * @param \Illuminate\Database\Query\Builder
    */
-  public function query($table = null)
+  public function setQuery($query)
   {
-    if (isset($this->query))
-      return $this->getQuery();
-    elseif ($table !== null) {
-
-      $this->query = $this->newBaseQueryBuilder($this->connection)->from($table);
-      return $this->getQuery();
-    }
-
-    throw new InvalidQueryException("Call first query method with table name parameter.");
+    $this->query = $query;
   }
 
   /**
-   * Is the blueprint ready to build.
+   * Create a new query.
    *
-   * @return boolean
+   * @param string
+   * @return \Illuminate\Database\Query\Builder
    */
-  public function isReady()
+  public function newQuery($table)
   {
-    return isset($this->query);
+    return $this->newBaseQueryBuilder($this->connection)->from($table);
   }
 
   /**
@@ -123,9 +119,6 @@ class Blueprint {
    */
   public function build(Connection $connection, ViewGrammar $grammar)
   {
-    if (!$this->isReady())
-      throw new BlueprintNotReadyException("Blueprint is not ready to build. Maybe add a query first.");
-
     foreach ($this->toSql($connection, $grammar) as $statement)
     {
       $connection->statement($statement);
