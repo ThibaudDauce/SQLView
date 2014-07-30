@@ -1,6 +1,9 @@
 SQLView
 =======
 
+[![Build Status](https://img.shields.io/travis/ThibaudDauce/SQLView/master.svg?style=flat)](https://travis-ci.org/ThibaudDauce/SQLView)
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](LICENSE.md)
+
 ## Introduction
 
 SQLView package allows you to easily create view for your database.
