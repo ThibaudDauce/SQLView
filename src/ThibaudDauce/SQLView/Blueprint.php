@@ -166,6 +166,16 @@ class Blueprint {
   }
 
   /**
+   * Indicate that the view should be dropped.
+   *
+   * @return \Illuminate\Support\Fluent
+   */
+  public function drop()
+  {
+    return $this->addCommand('drop');
+  }
+
+  /**
    * Add a new command to the blueprint.
    *
    * @param  string $name

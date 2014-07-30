@@ -48,6 +48,20 @@ class Builder {
   }
 
   /**
+   * Drop a table from the schema.
+   *
+   * @param  string  $view
+   */
+  public function drop($view)
+  {
+    $blueprint = new Blueprint($view, $this->getConnection());
+
+    $blueprint->drop();
+
+    $this->build($blueprint);
+  }
+
+  /**
    * Execute the blueprint to build / modify the view.
    *
    * @param  \ThibaudDauce\SQLView\Blueprint  $blueprint

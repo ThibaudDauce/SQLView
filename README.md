@@ -58,10 +58,10 @@ class AddUserView extends Migration {
    */
   public function down()
   {
-    //
+    SQLView::drop('user-view');
   }
 
 }
 ```
 
-TODO: Add `dropView` function and artisan command.
+TODO: Add artisan command.

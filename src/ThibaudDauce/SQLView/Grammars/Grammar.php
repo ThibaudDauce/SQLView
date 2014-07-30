@@ -39,4 +39,17 @@ class Grammar extends BaseGrammar {
 		return $sql;
 	}
 
+	/**
+	* Compile a drop view command.
+	*
+	* @param  \ThibaudDauce\SQLView\Blueprint  $blueprint
+	* @param  \Illuminate\Support\Fluent       $command
+	* @param  \Illuminate\Database\Connection  $connection
+	* @return string
+	*/
+	public function compileDrop(Blueprint $blueprint, Fluent $command, Connection $connection)
+	{
+		return 'drop view '.$this->wrapView($blueprint);
+	}
+
 }
